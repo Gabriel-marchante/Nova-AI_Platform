@@ -1,0 +1,246 @@
+﻿docker : INFO exec -a 
+"java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+En línea: 1 Carácter: 1
++ docker logs 
+mcp-client-app 2>&1 | 
+Out-File docker.log 
+-Encoding utf8
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (INF  
+  O exec -a "j...uarkus-   
+ run.jar :String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source
+INFO exec -a "java" java 
+-XX:MaxRAMPercentage=80.0 
+-XX:+UseParallelGC 
+-XX:MinHeapFreeRatio=10 
+-XX:MaxHeapFreeRatio=20 
+-XX:GCTimeRatio=4 -XX:Adapt
+iveSizePolicyWeight=90 -XX:
++ExitOnOutOfMemoryError -Dq
+uarkus.http.host=0.0.0.0 -D
+java.util.logging.manager=o
+rg.jboss.logmanager.LogMana
+ger -cp "." -jar /deploymen
+ts/quarkus-run.jar 
+INFO running in 
+/deployments
+Configuration validation 
+failed:
+	SRCFG00014: The config 
+property quarkus.langchain4
+j.openai.api-key is 
+required but it could not 
+be found in any config 
+source

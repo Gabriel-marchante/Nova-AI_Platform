@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: mcp-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: mcp_db
+      POSTGRES_USER: ${DB_USER:-mcp_user}
+      POSTGRES_PASSWORD: ${DB_PASS:-mcp_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-mcp_user} -d mcp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mcp-client:
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    container_name: mcp-client-app
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/mcp_db
+      - DB_USER=${DB_USER:-mcp_user}
+      - DB_PASS=${DB_PASS:-mcp_password}
+      - APP_MASTER_KEY=${APP_MASTER_KEY:-0123456789abcdef0123456789abcdef}
+      - QUARKUS_LANGCHAIN4J_OPENAI_API_KEY=dummy
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
