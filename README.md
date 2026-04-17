@@ -53,17 +53,7 @@ Cuando el usuario hace una pregunta, Claudio no actúa como un simple pasador de
 * Maven
 * Una API Key de Google Gemini Studio.
 
-### Variables de Entorno (`application.properties`)
-Debe configurarse la clave de la IA para que el orquestador pueda pensar:
-```properties
-gemini.api.key=AIzaSyTuClaveDeGoogleAqui...
 
-Ejecución en Modo Desarrollo
-Para arrancar el orquestador con Live Reload:
-
-Bash
-./mvnw clean quarkus:dev
-El panel de control (Dashboard) estará disponible en: http://localhost:8081
 
 
 ---
