@@ -60,6 +60,6 @@ Cuando el usuario hace una pregunta, Claudio no actúa como un simple pasador de
 
 ## ✍️ Créditos
 
-Desarrollado por **Macloud Team (Gabriel Marchante)**. Inspirado en herramientas de seguridad clásicas y estética retro-futurista.
+Desarrollado por **Macloud Team (Gabriel Marchante)**. 
 
 ---
