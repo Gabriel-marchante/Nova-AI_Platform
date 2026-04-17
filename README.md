@@ -64,3 +64,12 @@ Para arrancar el orquestador con Live Reload:
 Bash
 ./mvnw clean quarkus:dev
 El panel de control (Dashboard) estará disponible en: http://localhost:8081
+
+
+---
+
+## ✍️ Créditos
+
+Desarrollado por **Macloud Team (Gabriel Marchante)**. Inspirado en herramientas de seguridad clásicas y estética retro-futurista.
+
+---
