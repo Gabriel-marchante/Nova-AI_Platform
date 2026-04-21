@@ -1,7 +1,7 @@
-# 🤖 Documentación Técnica: Claudio (Orquestador MCP)
+# 🤖 Documentación Técnica: Nova (Orquestador MCP)
 
 ## 📌 Resumen del Proyecto
-**Claudio** es un Orquestador de Inteligencia Artificial (Agente Autónomo) construido sobre **Quarkus**. Su principal característica es la implementación del protocolo **MCP (Model Context Protocol)**, lo que le permite conectarse dinámicamente a servidores externos, descubrir sus herramientas (Tools) en tiempo real, y utilizarlas mediante la IA para resolver consultas complejas de los usuarios.
+**Nova** es un Orquestador de Inteligencia Artificial (Agente Autónomo) construido sobre **Quarkus**. Su principal característica es la implementación del protocolo **MCP (Model Context Protocol)**, lo que le permite conectarse dinámicamente a servidores externos, descubrir sus herramientas (Tools) en tiempo real, y utilizarlas mediante la IA para resolver consultas complejas de los usuarios.
 
 El "cerebro" cognitivo está impulsado por **Google Gemini 2.5 Flash** a través de la librería **LangChain4j**.
 
@@ -31,14 +31,14 @@ Interfaz reactiva basada en `@RegisterRestClient` de Quarkus.
 
 Cuando el usuario añade una nueva URL en el dashboard (ej. `http://localhost:8082/mcp/sse`), ocurre la siguiente magia por debajo:
 
-1. **Handshake (GET):** Claudio abre la conexión SSE con la URL indicada.
+1. **Handshake (GET):** Nova abre la conexión SSE con la URL indicada.
 2. **Enrutamiento (Evento `endpoint`):** El servidor responde indicando en qué URI secreta o dinámica espera recibir los POSTs (ej. `/mcp/message?sessionId=123`).
-3. **Inicialización (POST `initialize`):** Claudio se presenta y negocia la versión del protocolo (`2024-11-05`).
-4. **Descubrimiento (POST `tools/list`):** Claudio pide la lista de herramientas disponibles y las almacena en la caché de la sesión.
+3. **Inicialización (POST `initialize`):** Nova se presenta y negocia la versión del protocolo (`2024-11-05`).
+4. **Descubrimiento (POST `tools/list`):** Nova pide la lista de herramientas disponibles y las almacena en la caché de la sesión.
 
 ## 🧠 El Bucle de Razonamiento (Agentic Workflow)
 
-Cuando el usuario hace una pregunta, Claudio no actúa como un simple pasador de mensajes. Sigue un patrón de **Agente ReAct (Reasoning and Acting)**:
+Cuando el usuario hace una pregunta, Nova no actúa como un simple pasador de mensajes. Sigue un patrón de **Agente ReAct (Reasoning and Acting)**:
 
 1. **Evaluación:** Se inyecta la pregunta del usuario y el esquema JSON de TODAS las herramientas descubiertas en el *System Prompt* de Gemini.
 2. **Decisión:** Si Gemini necesita datos, responde con una estructura JSON pidiendo ejecutar una acción (`{"action": "tool", "toolName": "buscar_nota"...}`).

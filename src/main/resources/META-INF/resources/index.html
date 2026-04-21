@@ -114,10 +114,19 @@
             position: absolute; bottom: 60px; left: 15px; width: 200px;
             border-radius: 8px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 50;
         }
-        .popover-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #d4d4d8; }
+        .popover-item { padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #d4d4d8; display: flex; align-items: center; justify-content: space-between; }
         .popover-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .popover-item.submenu-trigger::after { content: '›'; font-size: 16px; }
         .text-danger { color: var(--danger); }
         .text-danger:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
+        .settings-submenu {
+            position: absolute; left: 210px; top: 0; width: 180px;
+            border-radius: 8px; padding: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 51; display: none;
+        }
+        .settings-submenu.show { display: block; }
+        .settings-submenu .popover-item { padding: 8px 12px; font-size: 13px; }
 
         /* CHAT AREA */
         .main-chat { flex: 1; display: flex; flex-direction: column; position: relative; background: rgba(9, 9, 11, 0.8); }
@@ -256,12 +265,13 @@
         </div>
 
         <div class="sidebar-footer">
-            <div class="settings-trigger" onmouseenter="document.getElementById('settingsPopover').classList.remove('hidden')" onmouseleave="document.getElementById('settingsPopover').classList.add('hidden')">
-                ⚙️ Ajustes / Perfil
+            <div class="settings-trigger" onmouseenter="document.getElementById('settingsPopover').classList.remove('hidden')" onmouseleave="closeSettingsPopover()">
+                ⚙️ Ajustes
                 <div class="popover-menu glass hidden" id="settingsPopover">
-                    <div class="popover-item" onclick="openSettings()">Ver Ajustes del Perfil</div>
-                    <div class="popover-item" onclick="openSettings('apikeys')">Gestionar Claves API</div>
-                    <div class="popover-item text-danger" onclick="logout()">Cerrar Sesión</div>
+                    <div class="popover-item" onclick="openSettings('profile'); closeSettingsPopover();">👤 Perfil</div>
+                    <div class="popover-item" onclick="openSettings('apikeys'); closeSettingsPopover();">🔑 APIs</div>
+                    <div class="popover-item" onclick="showAdminSettings()" id="adminSettingsItem" style="display:none; cursor:pointer; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">⚙️ Administración</div>
+                    <div class="popover-item text-danger" onclick="logout()">🚪 Cerrar Sesión</div>
                 </div>
             </div>
         </div>
@@ -313,11 +323,11 @@
             <button class="close-modal" onclick="closeSettings()">&times;</button>
         </div>
         
-        <div class="tabs">
-            <div class="tab active" onclick="switchSettingsTab('profile')" id="s-tab-profile">Perfil</div>
-            <div class="tab" onclick="switchSettingsTab('apikeys')" id="s-tab-apikeys">API Keys</div>
-            <div class="tab hidden admin-tab" onclick="switchSettingsTab('errors')" id="s-tab-errors">Errores</div>
-            <div class="tab hidden admin-tab" onclick="switchSettingsTab('mcps')" id="s-tab-mcps">MCP's</div>
+        <div class="tabs" id="settingsTabs">
+            <div class="tab active" onclick="switchSettingsTab('profile')" id="s-tab-profile">👤 Perfil</div>
+            <div class="tab" onclick="switchSettingsTab('apikeys')" id="s-tab-apikeys">🔑 API Keys</div>
+            <div class="tab hidden admin-tab" onclick="switchSettingsTab('errors')" id="s-tab-errors">⚠️ Errores</div>
+            <div class="tab hidden admin-tab" onclick="switchSettingsTab('mcps')" id="s-tab-mcps">🔌 MCP's</div>
         </div>
 
         <div class="modal-body">
@@ -413,11 +423,15 @@
                 }
 
                 userRole = payload.role || 'USER';
-                const adminTabs = document.querySelectorAll('.admin-tab');
+                
+                // Mostrar/ocultar admin settings
+                const adminItem = document.getElementById('adminSettingsItem');
                 if (userRole === 'ADMIN') {
-                    adminTabs.forEach(t => t.classList.remove('hidden'));
+                    adminItem.style.display = 'flex';
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('hidden'));
                 } else {
-                    adminTabs.forEach(t => t.classList.add('hidden'));
+                    adminItem.style.display = 'none';
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
                 }
                 
                 loadChatSidebar();
@@ -432,6 +446,15 @@
         localStorage.removeItem('jwt');
         document.getElementById('authView').classList.remove('hidden');
         document.getElementById('mainView').classList.add('hidden');
+    }
+
+    function closeSettingsPopover() {
+        document.getElementById('settingsPopover').classList.add('hidden');
+    }
+
+    function showAdminSettings() {
+        closeSettingsPopover();
+        openSettings('errors');
     }
 
     async function authFetch(url, options = {}) {
@@ -503,10 +526,18 @@
     async function loadChatSidebar() {
         try {
             const res = await authFetch('/api/chat/sessions');
-            chatSessions = await res.json();
+            if (!res.ok) {
+                console.error("Error al cargar chats. Status:", res.status);
+                return;
+            }
+            const data = await res.json();
+            chatSessions = Array.isArray(data) ? data : [];
+            console.log("Chats cargados:", chatSessions);
             renderChatList(chatSessions, 'chatHistoryList');
         } catch (e) {
             console.error("Error al cargar chats", e);
+            chatSessions = [];
+            renderChatList([], 'chatHistoryList');
         }
     }
 
@@ -608,7 +639,13 @@
                 loadChatSidebar();
             }
 
-            const replyText = typeof data.reply === 'string' && data.reply.trim() ? data.reply : 'Respuesta generada correctamente.';
+            // Asegurar que reply siempre tiene contenido válido
+            let replyText = data.reply;
+            if (!replyText || (typeof replyText === 'string' && !replyText.trim())) {
+                replyText = data.toolInfo && Array.isArray(data.toolInfo) && data.toolInfo.length > 0 
+                    ? 'He procesado tu solicitud y he ejecutado las herramientas necesarias.'
+                    : 'No pude generar una respuesta completa. Intenta de nuevo.';
+            }
             let html = `<div>${replyText}</div>`;
 
             const toolEntries = Array.isArray(data.toolInfo) ? data.toolInfo : (data.toolInfo ? [data.toolInfo] : []);

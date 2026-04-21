@@ -32,7 +32,7 @@ services:
       - DB_USER=${DB_USER:-mcp_user}
       - DB_PASS=${DB_PASS:-mcp_password}
       - APP_MASTER_KEY=${APP_MASTER_KEY:-0123456789abcdef0123456789abcdef}
-      - QUARKUS_LANGCHAIN4J_OPENAI_API_KEY=dummy
+      - QUARKUS_LANGCHAIN4J_OPENAI_API_KEY=dummy-not-used
     depends_on:
       postgres:
         condition: service_healthy
