@@ -123,14 +123,14 @@ public class AuthResource {
             user.profilePicture = req.newProfilePicture;
         }
 
-        if (req.newGeminiKey != null) {
-            user.geminiKeyEnc = req.newGeminiKey.isBlank() ? null : encryptionService.encrypt(req.newGeminiKey);
+        if (req.newGeminiKey != null && !req.newGeminiKey.isBlank()) {
+            user.geminiKeyEnc = encryptionService.encrypt(req.newGeminiKey);
         }
-        if (req.newOpenAiKey != null) {
-            user.openaiKeyEnc = req.newOpenAiKey.isBlank() ? null : encryptionService.encrypt(req.newOpenAiKey);
+        if (req.newOpenAiKey != null && !req.newOpenAiKey.isBlank()) {
+            user.openaiKeyEnc = encryptionService.encrypt(req.newOpenAiKey);
         }
-        if (req.newClaudeKey != null) {
-            user.anthropicKeyEnc = req.newClaudeKey.isBlank() ? null : encryptionService.encrypt(req.newClaudeKey);
+        if (req.newClaudeKey != null && !req.newClaudeKey.isBlank()) {
+            user.anthropicKeyEnc = encryptionService.encrypt(req.newClaudeKey);
         }
 
         user.persist();

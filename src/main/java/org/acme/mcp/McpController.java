@@ -119,6 +119,14 @@ public class McpController {
             chatSession = new org.acme.mcp.model.ChatSessionEntity();
             chatSession.user = currentUser;
             chatSession.title = userMessage.length() > 30 ? userMessage.substring(0, 30) + "..." : userMessage;
+            
+            String projectIdStr = readString(payload, "projectId");
+            if (projectIdStr != null && !projectIdStr.isBlank()) {
+                org.acme.mcp.model.ProjectEntity project = org.acme.mcp.model.ProjectEntity.findById(UUID.fromString(projectIdStr));
+                if (project != null && project.user.id.equals(userId)) {
+                    chatSession.project = project;
+                }
+            }
             chatSession.persist();
         } else {
             chatSession = org.acme.mcp.model.ChatSessionEntity.findById(UUID.fromString(sessionIdStr));
@@ -154,9 +162,14 @@ public class McpController {
             finalResult.put("sessionId", chatSession.id.toString());
             return finalResult;
         } catch (Exception e) {
+            String error = e.getMessage() != null ? e.getMessage() : e.toString();
+            if (error.contains("429") || error.contains("RESOURCE_EXHAUSTED") || error.contains("quota")) {
+                error = "Has agotado tu cuota gratuita de Gemini para hoy. Por favor, revisa tu plan en Google AI Studio o espera a que se reinicie tu cuota.";
+            }
+
             // Guardar en tabla de errores para administrador si es error de sistema o MCP
-            saveSystemError(currentUser, e.getMessage() != null ? e.getMessage() : e.toString());
-            return Map.of("error", e.getMessage() != null ? e.getMessage() : "Error del agente: Ocurrió un error inesperado.");
+            saveSystemError(currentUser, error);
+            return Map.of("error", error);
         }
     }
 

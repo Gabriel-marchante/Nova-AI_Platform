@@ -41,17 +41,75 @@ public class AdminResource {
             return Response.status(Response.Status.FORBIDDEN).entity(Map.of("error", "Access denied")).build();
         }
         
-        // Fetch all errors
-        List<SystemError> errors = SystemError.listAll();
-        var result = errors.stream().map(e -> Map.of(
-                "id", e.id,
-                "errorMessage", e.errorMessage,
-                "date", e.errorDate.toString(),
-                "count", e.occurrenceCount,
-                "user", e.user != null ? e.user.email : "Unknown"
-        )).collect(Collectors.toList());
+        // Fetch all errors sorted by date
+        List<SystemError> errors = SystemError.find("order by errorDate desc").list();
+        var result = errors.stream().map(e -> {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", e.id.toString());
+            map.put("errorMessage", e.errorMessage);
+            map.put("date", e.errorDate != null ? e.errorDate.toString() : "");
+            map.put("count", e.occurrenceCount);
+            map.put("user", e.user != null ? e.user.email : "Desconocido");
+            return map;
+        }).collect(Collectors.toList());
 
         return Response.ok(result).build();
+    }
+
+    @GET
+    @Path("/users")
+    public Response getUsers(@QueryParam("search") String search) {
+        if (getAdminUser() == null) {
+            return Response.status(Response.Status.FORBIDDEN).entity(Map.of("error", "Access denied")).build();
+        }
+
+        List<User> users;
+        if (search != null && !search.isBlank()) {
+            users = User.find("username like ?1 or email like ?1", "%" + search + "%").list();
+        } else {
+            users = User.listAll();
+        }
+
+        var result = users.stream().map(u -> {
+            long chatCount = org.acme.mcp.model.ChatSessionEntity.count("user", u);
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", u.id.toString());
+            map.put("username", u.username);
+            map.put("email", u.email != null ? u.email : "");
+            map.put("role", u.role);
+            map.put("profilePicture", u.profilePicture != null ? u.profilePicture : "");
+            map.put("chatCount", chatCount);
+            map.put("createdAt", u.createdAt != null ? u.createdAt.toString() : "");
+            return map;
+        }).collect(Collectors.toList());
+
+        return Response.ok(result).build();
+    }
+
+    @GET
+    @Path("/users/{id}")
+    public Response getUserDetails(@PathParam("id") UUID userId) {
+        if (getAdminUser() == null) {
+            return Response.status(Response.Status.FORBIDDEN).entity(Map.of("error", "Access denied")).build();
+        }
+
+        User user = User.findById(userId);
+        if (user == null) return Response.status(404).build();
+
+        long chatCount = org.acme.mcp.model.ChatSessionEntity.count("user", user);
+        long projectCount = org.acme.mcp.model.ProjectEntity.count("user", user);
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("id", user.id.toString());
+        data.put("username", user.username);
+        data.put("email", user.email != null ? user.email : "");
+        data.put("role", user.role);
+        data.put("profilePicture", user.profilePicture != null ? user.profilePicture : "");
+        data.put("chatCount", chatCount);
+        data.put("projectCount", projectCount);
+        data.put("createdAt", user.createdAt != null ? user.createdAt.toString() : "");
+
+        return Response.ok(data).build();
     }
 
     @GET
@@ -62,12 +120,14 @@ public class AdminResource {
         }
         
         List<McpServerEntity> mcps = McpServerEntity.listAll();
-        var result = mcps.stream().map(m -> Map.of(
-                "id", m.id,
-                "name", m.name,
-                "url", m.url,
-                "isActive", m.isActive
-        )).collect(Collectors.toList());
+        var result = mcps.stream().map(m -> {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            map.put("id", m.id.toString());
+            map.put("name", m.name);
+            map.put("url", m.url);
+            map.put("isActive", m.isActive);
+            return map;
+        }).collect(Collectors.toList());
 
         return Response.ok(result).build();
     }

@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova AI</title>
+    <title>Nova - Macloud Team</title>
+    <link rel="icon" href="logonova.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -164,6 +166,9 @@
         .json-block { color: var(--text-muted); white-space: pre-wrap; margin-top: 4px; word-break: break-all; }
 
         .chat-input-area { padding: 20px 30px; border-top: 1px solid var(--glass-border); background: var(--glass-bg); }
+        .logo-container { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .logo-img { width: 50px; height: 50px; border-radius: 12px; transform: scale(1.5); margin-left: 10px; }
+        .logo-container h1 { font-size: 28px; font-weight: 800; }
         .input-toolbar { display: flex; gap: 10px; margin-bottom: 12px; }
         .chat-row { display: flex; gap: 10px; }
         .chat-row input { flex:1; padding: 18px 24px; border-radius: 30px; font-size: 15px; border: 1px solid #3f3f46; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
@@ -182,7 +187,12 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .modal-content { width: 600px; max-width: 90vw; max-height: 85vh; border-radius: 16px; padding: 30px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-content {
+            background: #18181b; border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 30px; position: relative; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 600px; max-width: 90vw; display: flex; flex-direction: column;
+        }
         
         /* Search Widget Specifics */
         .search-widget {
@@ -191,8 +201,15 @@
         }
         .search-list { max-height: 300px; overflow-y: auto; margin-top: 15px; }
 
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
-        .modal-header h2 { margin: 0; font-family: 'Outfit', sans-serif;}
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h2 { font-size: 24px; font-weight: 700; margin: 0; }
+        .tabs { display: flex; gap: 15px; border-bottom: 1px solid var(--glass-border); margin-bottom: 25px; overflow-x: auto; white-space: nowrap; }
+        .tab { 
+            padding: 10px 15px; cursor: pointer; color: var(--text-muted); font-size: 14px; 
+            border-bottom: 2px solid transparent; transition: all 0.3s;
+        }
+        .tab:hover { color: white; }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
         .close-modal { background: transparent; color: white; padding: 0; font-size: 24px; cursor:pointer;}
 
         .modal-body { flex: 1; overflow-y: auto; padding-right: 10px;}
@@ -205,6 +222,59 @@
         .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;}
         .badge.online { background: rgba(16, 185, 129, 0.2); color: #34d399;}
         .badge.offline { background: rgba(239, 68, 68, 0.2); color: #f87171;}
+
+        /* PROJECT STYLES */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; }
+        .project-card {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 20px; text-align: center; cursor: pointer; position: relative;
+        }
+        .project-card:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); transform: translateY(-3px); }
+        .project-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+        .project-name { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .project-count { font-size: 11px; color: var(--text-muted); margin-top: 5px; display: block; }
+
+        /* CONTEXT MENU */
+        .chat-item-container { position: relative; display: flex; align-items: center; }
+        .chat-item { flex: 1; }
+        .chat-options-trigger {
+            opacity: 0; padding: 5px 10px; cursor: pointer; color: var(--text-muted);
+            border-radius: 4px; font-weight: bold;
+        }
+        .chat-item-container:hover .chat-options-trigger { opacity: 1; }
+        .chat-options-trigger:hover { color: white; background: rgba(255,255,255,0.1); }
+
+        .context-menu {
+            position: fixed; background: #18181b; border: 1px solid #3f3f46; border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 2000; display: none; width: 160px; padding: 5px;
+        }
+        .context-menu-item {
+            padding: 10px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; color: #d4d4d8;
+        }
+        .context-menu-item:hover { background: var(--accent); color: white; }
+
+        /* ADMIN USERS LIST */
+        .user-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .user-card {
+            display: flex; align-items: center; gap: 15px; padding: 12px;
+            background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+        .user-card:hover { border-color: var(--accent); background: rgba(255,255,255,0.05); }
+        .user-card img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .user-details-title { font-family: 'Outfit', sans-serif; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; margin-bottom: 15px; }
+        
+        /* SELECTOR DE PROYECTO */
+        .project-selector-list { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .project-selector-item {
+            padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--glass-border);
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+        }
+        .project-selector-item:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        .project-selector-item.active { border-color: var(--accent); background: rgba(96, 165, 250, 0.1); }
+        .stat-box { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 20px; font-weight: 800; color: var(--accent); display: block; }
+        .stat-label { font-size: 11px; color: var(--text-muted); }
 
     </style>
 </head>
@@ -256,6 +326,7 @@
         <div class="sidebar-actions">
             <button class="outline" onclick="startNewChat()">+ Nuevo Chat</button>
             <button class="outline" onclick="openSearchWidget()" style="border-color: #3f3f46; color: #d4d4d8;">🔍 Buscar Chat</button>
+            <button class="outline" onclick="openProjectsWidget()" style="border-color: #3f3f46; color: #d4d4d8;">📁 Mis Proyectos</button>
         </div>
 
         <div class="chat-history-container">
@@ -265,7 +336,7 @@
         </div>
 
         <div class="sidebar-footer">
-            <div class="settings-trigger" onmouseenter="document.getElementById('settingsPopover').classList.remove('hidden')" onmouseleave="closeSettingsPopover()">
+            <div class="settings-trigger" onclick="openSettings('profile')" onmouseenter="document.getElementById('settingsPopover').classList.remove('hidden')" onmouseleave="closeSettingsPopover()">
                 ⚙️ Ajustes
                 <div class="popover-menu glass hidden" id="settingsPopover">
                     <div class="popover-item" onclick="openSettings('profile'); closeSettingsPopover();">👤 Perfil</div>
@@ -278,9 +349,9 @@
     </aside>
 
     <main class="main-chat">
-        <div class="chat-header">
-            <img src="logonova.png" alt="Logotipo" class="nova-logo" onerror="this.style.display='none'">
-            <h2>NOVA</h2>
+        <div class="logo-container">
+            <img src="logonova.png" alt="Nova Logo" class="logo-img">
+            <h1>NOVA</h1>
         </div>
         
         <div id="chat-window">
@@ -305,12 +376,15 @@
 
 <!-- SEARCH WIDGET OVERLAY -->
 <div id="searchWidgetOverlay" class="modal-overlay" onclick="if(event.target===this) closeSearchWidget()">
-    <div class="search-widget glass">
-        <div class="form-group" style="margin: 0;">
-            <input type="text" id="searchInput" placeholder="Escribe para buscar chats guardados..." onkeyup="filterChats()">
+        <div class="search-widget glass">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom: 20px;">
+                <img src="logonova.png" width="30" height="30" style="transform: scale(1.5); margin-right: 10px; border-radius: 6px;">
+                <h2 style="margin:0;">Buscador Inteligente</h2>
+            </div>
+            <input type="text" id="searchInput" placeholder="Busca mensajes, archivos o temas..." onkeyup="filterChats()">
+            <div class="search-list" id="searchResults"></div>
         </div>
-        <div class="search-list" id="searchResults">
-            <!-- Search Results -->
+    <!-- Search Results -->
         </div>
     </div>
 </div>
@@ -327,6 +401,7 @@
             <div class="tab active" onclick="switchSettingsTab('profile')" id="s-tab-profile">👤 Perfil</div>
             <div class="tab" onclick="switchSettingsTab('apikeys')" id="s-tab-apikeys">🔑 API Keys</div>
             <div class="tab hidden admin-tab" onclick="switchSettingsTab('errors')" id="s-tab-errors">⚠️ Errores</div>
+            <div class="tab hidden admin-tab" onclick="switchSettingsTab('users')" id="s-tab-users">👥 Usuarios</div>
             <div class="tab hidden admin-tab" onclick="switchSettingsTab('mcps')" id="s-tab-mcps">🔌 MCP's</div>
         </div>
 
@@ -390,7 +465,72 @@
                     </table>
                 </div>
             </div>
+
+            <div id="view-users" class="hidden">
+                <div class="form-group"><input type="text" id="userSearchInput" placeholder="Buscar usuarios..." onkeyup="loadUsers(this.value)"></div>
+                <div class="user-list" id="usersList">
+                    <!-- Users list -->
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- PROJECTS MODAL -->
+<div id="projectsModal" class="modal-overlay" onclick="if(event.target===this) closeProjectsWidget()">
+    <div class="modal-content glass" style="width: 700px;">
+        <div class="modal-header">
+            <h2 id="projectsModalTitle">Mis Proyectos</h2>
+            <button class="close-modal" onclick="closeProjectsWidget()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="projectMainView">
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="newProjectName" placeholder="Nueva carpeta de proyecto...">
+                    <button onclick="createProject()">Crear</button>
+                </div>
+                <div class="project-grid" id="projectGrid">
+                    <!-- Projects -->
+                </div>
+            </div>
+            <div id="projectDetailView" class="hidden">
+                <button class="outline" onclick="backToProjects()" style="margin-bottom:15px; padding:5px 10px;">&larr; Volver</button>
+                <div id="projectChatsHeader" style="margin-bottom:15px;">
+                    <h3 id="currentProjectNameDisplay" style="margin:0 0 5px 0;">Proyecto</h3>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="projectChatSearch" placeholder="Buscar en este proyecto..." style="padding:8px; flex:1;">
+                        <button onclick="startNewChatInProject()" style="padding:8px 15px;">+ Nuevo Chat</button>
+                    </div>
+                </div>
+                <div id="projectChatsList" class="chat-list" style="border: 1px solid var(--glass-border); border-radius:8px;">
+                    <!-- Project Chats -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="chatContextMenu" class="context-menu glass">
+    <div class="context-menu-item" onclick="promptMoveToProject()">📦 Mover a Proyecto</div>
+    <div class="context-menu-item text-danger" onclick="deleteChatFromMenu()">🗑️ Eliminar Chat</div>
+</div>
+
+<!-- SELECTOR DE PROYECTO MODAL -->
+<div id="projectSelectorModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+    <div class="modal-content glass" style="width: 400px;">
+        <div class="modal-header">
+            <h3>Seleccionar Proyecto</h3>
+            <button class="close-modal" onclick="document.getElementById('projectSelectorModal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="project-selector-list" id="projectSelectorList">
+            <!-- List will be populated by JS -->
+        </div>
+    </div>
+</div>
+<div id="userDetailsModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+    <div class="modal-content glass" style="width: 450px;">
+        <div id="userDetailsContent"></div>
     </div>
 </div>
 
@@ -398,7 +538,10 @@
     let currentAuthTab = 'login';
     let userRole = 'USER';
     let currentSessionId = null;
+    let currentProjectId = null;
     let chatSessions = [];
+    let projects = [];
+    let activeMenuChatId = null;
 
     // ======== UTILS ========
     function getJwt() { return localStorage.getItem('jwt'); }
@@ -451,6 +594,13 @@
     function closeSettingsPopover() {
         document.getElementById('settingsPopover').classList.add('hidden');
     }
+
+    // Close context menu on click outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.chat-options-trigger') && !e.target.closest('.context-menu')) {
+            document.getElementById('chatContextMenu').style.display = 'none';
+        }
+    });
 
     function showAdminSettings() {
         closeSettingsPopover();
@@ -545,26 +695,116 @@
         const container = document.getElementById(containerId);
         container.innerHTML = '';
         sessions.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'chat-item-container';
+            
             const li = document.createElement('li');
             li.className = 'chat-item';
             if (s.id === currentSessionId) li.classList.add('active');
             li.textContent = s.title;
-            li.onclick = () => openExistingChat(s.id);
-            container.appendChild(li);
+            li.onclick = () => openExistingChat(s.id, s.projectId);
+            
+            const dots = document.createElement('div');
+            dots.className = 'chat-options-trigger';
+            dots.textContent = '...';
+            dots.onclick = (e) => {
+                e.stopPropagation();
+                showContextMenu(e, s.id);
+            };
+            
+            div.appendChild(li);
+            div.appendChild(dots);
+            container.appendChild(div);
         });
+    }
+
+    function showContextMenu(e, chatId) {
+        activeMenuChatId = chatId;
+        const menu = document.getElementById('chatContextMenu');
+        menu.style.display = 'block';
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+    }
+
+    async function deleteChatFromMenu() {
+        if (!confirm("¿Seguro que quieres eliminar este chat?")) return;
+        try {
+            const res = await authFetch('/api/chat/sessions/' + activeMenuChatId, { method: 'DELETE' });
+            if (res.ok) {
+                if (currentSessionId === activeMenuChatId) startNewChat();
+                loadChatSidebar();
+                if (currentProjectId) loadProjectChats(currentProjectId);
+                document.getElementById('chatContextMenu').style.display = 'none';
+            }
+        } catch (e) {}
+    }
+
+    async function promptMoveToProject() {
+        await loadProjects();
+        const list = document.getElementById('projectSelectorList');
+        list.innerHTML = '';
+        
+        // Add "Historial General" option
+        const historyItem = document.createElement('div');
+        historyItem.className = 'project-selector-item';
+        historyItem.innerHTML = '📂 Historial General';
+        historyItem.onclick = () => doMoveChat(null);
+        list.appendChild(historyItem);
+
+        projects.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'project-selector-item';
+            item.innerHTML = `📁 ${p.name}`;
+            item.onclick = () => doMoveChat(p.id);
+            list.appendChild(item);
+        });
+
+        document.getElementById('projectSelectorModal').classList.add('active');
+    }
+
+    async function doMoveChat(targetId) {
+        try {
+            const res = await authFetch(`/api/chat/sessions/${activeMenuChatId}/move`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ projectId: targetId })
+            });
+            if (res.ok) {
+                // If the moved chat is the current one, update state
+                if (activeMenuChatId === currentSessionId) {
+                    currentProjectId = targetId;
+                }
+                
+                loadChatSidebar();
+                if (currentProjectId) loadProjectChats(currentProjectId);
+                else if (targetId === null) loadChatSidebar(); // Refresh general history
+                
+                document.getElementById('projectSelectorModal').classList.remove('active');
+                document.getElementById('chatContextMenu').style.display = 'none';
+            }
+        } catch (e) {}
     }
 
     function startNewChat() {
         currentSessionId = null;
+        currentProjectId = null;
         document.getElementById('chat-window').innerHTML = '<div class="msg ai">¡Hola! Soy Nova, tu asistente. ¿En qué te puedo ayudar hoy?</div>';
         loadChatSidebar(); // Unmark active
     }
 
-    async function openExistingChat(id) {
+    function startNewChatInProject() {
+        currentSessionId = null;
+        document.getElementById('chat-window').innerHTML = `<div class="msg ai">¡Hola! Has iniciado un nuevo chat dentro del proyecto. Todo el contexto de esta carpeta será enviado a Nova.</div>`;
+        closeProjectsWidget();
+    }
+
+    async function openExistingChat(id, projectId = null) {
         currentSessionId = id;
+        currentProjectId = projectId;
         document.getElementById('chat-window').innerHTML = '';
         renderChatList(chatSessions, 'chatHistoryList'); // Update active state
         closeSearchWidget();
+        closeProjectsWidget();
 
         try {
             const res = await authFetch('/api/chat/sessions/' + id + '/messages');
@@ -598,10 +838,20 @@
         document.getElementById('searchWidgetOverlay').classList.remove('active');
     }
 
-    function filterChats() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = chatSessions.filter(s => s.title.toLowerCase().includes(query));
-        renderChatList(filtered, 'searchResults');
+    async function filterChats() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (query.length < 2) {
+            renderChatList(chatSessions, 'searchResults');
+            return;
+        }
+        
+        try {
+            const res = await authFetch('/api/chat/sessions/search?q=' + encodeURIComponent(query));
+            const data = await res.json();
+            renderChatList(data, 'searchResults');
+        } catch (e) {
+            console.error("Error searching", e);
+        }
     }
 
     async function sendChat() {
@@ -620,6 +870,7 @@
         try {
             const payload = { message: text, model: model };
             if (currentSessionId) payload.sessionId = currentSessionId;
+            if (!currentSessionId && currentProjectId) payload.projectId = currentProjectId;
 
             const res = await authFetch('/api/mcp/chat', {
                 method: 'POST',
@@ -636,7 +887,8 @@
 
             if (data.sessionId && data.sessionId !== currentSessionId) {
                 currentSessionId = data.sessionId;
-                loadChatSidebar();
+                if (currentProjectId) loadProjectChats(currentProjectId);
+                else loadChatSidebar();
             }
 
             // Asegurar que reply siempre tiene contenido válido
@@ -693,14 +945,17 @@
         document.querySelectorAll('#settingsModal .tab').forEach(t => t.classList.remove('active'));
         document.getElementById('s-tab-' + tab).classList.add('active');
         
-        document.getElementById('view-profile').classList.add('hidden');
-        document.getElementById('view-apikeys').classList.add('hidden');
-        document.getElementById('view-errors').classList.add('hidden');
-        document.getElementById('view-mcps').classList.add('hidden');
+        // Hide all views first
+        ['view-profile', 'view-apikeys', 'view-errors', 'view-mcps', 'view-users'].forEach(v => {
+            const el = document.getElementById(v);
+            if (el) el.classList.add('hidden');
+        });
         
-        document.getElementById('view-' + tab).classList.remove('hidden');
+        const target = document.getElementById('view-' + tab);
+        if (target) target.classList.remove('hidden');
 
         if (tab === 'errors') loadErrors();
+        if (tab === 'users') loadUsers();
         if (tab === 'mcps') loadMcps();
     }
 
@@ -732,6 +987,13 @@
                 if(data.token) setJwt(data.token);
                 successEl.textContent = data.message || 'Actualizado correctamente';
                 successEl.classList.remove('hidden');
+                
+                // Clear sensitive fields
+                document.getElementById('setNewPassword').value = '';
+                document.getElementById('setGeminiKey').value = '';
+                document.getElementById('setOpenaiKey').value = '';
+                document.getElementById('setClaudeKey').value = '';
+                
                 checkAuth(); // update views quickly
             }
         } catch(e) {
@@ -780,6 +1042,128 @@
 
     async function toggleMcp(id) { try { await authFetch('/api/admin/mcps/'+id+'/toggle', {method: 'PUT'}); loadMcps(); } catch(e){} }
     async function deleteMcp(id) { if(!confirm("¿Borrar MCP?")) return; try { await authFetch('/api/admin/mcps/'+id, {method: 'DELETE'}); loadMcps(); } catch(e){} }
+
+    /* ==== PROJECTS LOGIC ==== */
+    async function loadProjects() {
+        try {
+            const res = await authFetch('/api/projects');
+            projects = await res.json();
+            renderProjects();
+        } catch (e) {}
+    }
+
+    function renderProjects() {
+        const grid = document.getElementById('projectGrid');
+        grid.innerHTML = '';
+        projects.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.onclick = () => openProjectDetails(p);
+            card.innerHTML = `<span class="project-icon">📁</span><span class="project-name">${p.name}</span><span class="project-count">Ver Chats</span>`;
+            grid.appendChild(card);
+        });
+    }
+
+    async function createProject() {
+        const name = document.getElementById('newProjectName').value.trim();
+        if (!name) return;
+        try {
+            const res = await authFetch('/api/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+            if (res.ok) {
+                document.getElementById('newProjectName').value = '';
+                loadProjects();
+            }
+        } catch (e) {}
+    }
+
+    function openProjectsWidget() {
+        document.getElementById('projectsModal').classList.add('active');
+        backToProjects();
+        loadProjects();
+    }
+
+    function closeProjectsWidget() {
+        document.getElementById('projectsModal').classList.remove('active');
+    }
+
+    function openProjectDetails(project) {
+        currentProjectId = project.id;
+        document.getElementById('projectMainView').classList.add('hidden');
+        document.getElementById('projectDetailView').classList.remove('hidden');
+        document.getElementById('currentProjectNameDisplay').textContent = project.name;
+        loadProjectChats(project.id);
+    }
+
+    function backToProjects() {
+        currentProjectId = null;
+        document.getElementById('projectMainView').classList.remove('hidden');
+        document.getElementById('projectDetailView').classList.add('hidden');
+    }
+
+    async function loadProjectChats(projectId) {
+        try {
+            const res = await authFetch(`/api/projects/${projectId}/chats`);
+            const data = await res.json();
+            renderChatList(data, 'projectChatsList');
+        } catch (e) {}
+    }
+
+    /* ==== USERS LOGIC ==== */
+    async function loadUsers(search = '') {
+        try {
+            const res = await authFetch(`/api/admin/users?search=${search}`);
+            const data = await res.json();
+            const list = document.getElementById('usersList');
+            list.innerHTML = '';
+            data.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.onclick = () => showUserDetails(u.id);
+                const avatar = u.profilePicture || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+                card.innerHTML = `
+                    <img src="${avatar}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2394a3b8%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>'">
+                    <div style="flex:1">
+                        <div style="font-weight:600">${u.username}</div>
+                        <div style="font-size:12px; color:var(--text-muted)">${u.email}</div>
+                    </div>
+                    <div class="badge online">${u.chatCount} chats</div>
+                `;
+                list.appendChild(card);
+            });
+        } catch (e) {}
+    }
+
+    async function showUserDetails(userId) {
+        try {
+            const res = await authFetch(`/api/admin/users/${userId}`);
+            const u = await res.json();
+            const details = document.getElementById('userDetailsContent');
+            details.innerHTML = `
+                <h2 class="user-details-title">Detalles del Usuario</h2>
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:20px;">
+                    <img src="${u.profilePicture || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>"}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid var(--accent)">
+                    <div>
+                        <div style="font-size:20px; font-weight:800">${u.username}</div>
+                        <div style="color:var(--text-muted)">${u.email}</div>
+                        <div style="font-size:12px; margin-top:5px;">ID: ${u.id}</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box"><span class="stat-value">${u.chatCount}</span><span class="stat-label">CHATS</span></div>
+                    <div class="stat-box"><span class="stat-value">${u.projectCount}</span><span class="stat-label">PROYECTOS</span></div>
+                </div>
+                <div style="margin-top:20px; font-size:13px; color:var(--text-muted)">
+                    Registrado el: ${new Date(u.createdAt).toLocaleDateString()}
+                    <br>Rango: <span class="badge online">${u.role}</span>
+                </div>
+            `;
+            document.getElementById('userDetailsModal').classList.add('active');
+        } catch (e) {}
+    }
 
 </script>
 </body>

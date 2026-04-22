@@ -6,23 +6,19 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "chat_sessions")
-public class ChatSessionEntity extends PanacheEntityBase {
+@Table(name = "projects")
+public class ProjectEntity extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     public User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    public ProjectEntity project;
-
     @Column(nullable = false)
-    public String title;
+    public String name;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     public LocalDateTime createdAt;

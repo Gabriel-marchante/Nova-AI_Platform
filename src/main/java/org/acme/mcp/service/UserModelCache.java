@@ -14,6 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @ApplicationScoped
 public class UserModelCache {
 
+    static {
+        // Forzamos el uso del cliente de Quarkus programaticamente para resolver el conflicto del classpath
+        System.setProperty("langchain4j.http.clientBuilderFactory", "io.quarkiverse.langchain4j.jaxrsclient.JaxRsHttpClientBuilderFactory");
+    }
+
     @Inject
     EncryptionService encryptionService;
 
