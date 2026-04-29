@@ -276,6 +276,33 @@
         .stat-value { font-size: 20px; font-weight: 800; color: var(--accent); display: block; }
         .stat-label { font-size: 11px; color: var(--text-muted); }
 
+        /* ATTACHMENTS */
+        .attach-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+        .attach-card {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px;
+            padding: 8px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer;
+            max-width: 200px; position: relative; overflow: hidden;
+        }
+        .attach-card:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+        .attach-icon { font-size: 20px; }
+        .attach-info { flex: 1; overflow: hidden; }
+        .attach-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .attach-size { font-size: 10px; color: var(--text-muted); }
+        .attach-remove { color: var(--danger); font-size: 16px; cursor: pointer; padding: 2px 6px; }
+        .attach-remove:hover { background: rgba(239, 68, 68, 0.1); border-radius: 50%; }
+
+        .chat-input-area.drag-over { border-top: 2px dashed var(--accent); background: rgba(99, 102, 241, 0.05); }
+
+        /* VISUALIZER MODAL */
+        #visualizerModal .modal-content { width: 800px; height: 80vh; }
+        #visualizerContent { flex: 1; display: flex; align-items: center; justify-content: center; overflow: auto; background: #09090b; border-radius: 8px; padding: 20px; }
+        #visualizerContent img, #visualizerContent video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        #visualizerContent pre { width: 100%; color: #d4d4d8; font-family: monospace; font-size: 13px; white-space: pre-wrap; margin: 0; }
+
+        .btn-attach { background: transparent; border: 1px solid #3f3f46; color: var(--text-muted); padding: 0 15px; border-radius: 30px; font-size: 18px; }
+        .btn-attach:hover { color: white; border-color: var(--accent); }
+
+
     </style>
 </head>
 
@@ -366,13 +393,28 @@
                     <option value="claude">Claude 3 Haiku</option>
                 </select>
             </div>
+            <div id="attachPreviewList" class="attach-list"></div>
             <div class="chat-row">
+                <button class="btn-attach" onclick="document.getElementById('fileInput').click()" title="Adjuntar archivos">📎</button>
+                <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
                 <input type="text" id="chatInput" placeholder="Envía un mensaje a Nova..." onkeypress="if(event.key==='Enter') sendChat()">
                 <button onclick="sendChat()">Enviar</button>
             </div>
         </div>
     </main>
 </div>
+
+<!-- VISUALIZER MODAL -->
+<div id="visualizerModal" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('active')">
+    <div class="modal-content glass">
+        <div class="modal-header">
+            <h2 id="visualizerTitle">Archivo</h2>
+            <button class="close-modal" onclick="document.getElementById('visualizerModal').classList.remove('active')">&times;</button>
+        </div>
+        <div id="visualizerContent"></div>
+    </div>
+</div>
+
 
 <!-- SEARCH WIDGET OVERLAY -->
 <div id="searchWidgetOverlay" class="modal-overlay" onclick="if(event.target===this) closeSearchWidget()">
@@ -542,6 +584,28 @@
     let chatSessions = [];
     let projects = [];
     let activeMenuChatId = null;
+    let pendingFiles = []; // Array de { name, content, type, size }
+
+    // Drag and Drop support
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropZone = document.querySelector('.chat-input-area');
+        if (dropZone) {
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files);
+                processFiles(files);
+            });
+        }
+    });
+
 
     // ======== UTILS ========
     function getJwt() { return localStorage.getItem('jwt'); }
@@ -857,11 +921,18 @@
     async function sendChat() {
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
-        if (!text) return;
+        if (!text && pendingFiles.length === 0) return;
         
         const model = document.getElementById('modelSelector').value;
+        const currentAttachments = [...pendingFiles];
+        pendingFiles = [];
+        renderAttachments();
 
-        appendMessage('user', text);
+        let userMsgHtml = `<div>${text || '(Archivo adjunto)'}</div>`;
+        currentAttachments.forEach(f => {
+            userMsgHtml += `<div style="font-size:11px; color:rgba(255,255,255,0.7); margin-top:4px;">📎 ${f.name}</div>`;
+        });
+        appendMessage('user', userMsgHtml, true);
         input.value = '';
 
         const loadingId = 'loading-' + Date.now();
@@ -871,12 +942,16 @@
             const payload = { message: text, model: model };
             if (currentSessionId) payload.sessionId = currentSessionId;
             if (!currentSessionId && currentProjectId) payload.projectId = currentProjectId;
+            if (currentAttachments.length > 0) {
+                payload.attachments = currentAttachments.map(f => ({ fileName: f.name, fileContent: f.content }));
+            }
 
             const res = await authFetch('/api/mcp/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+
             const data = await res.json();
             document.getElementById(loadingId).remove();
 
@@ -1165,6 +1240,98 @@
         } catch (e) {}
     }
 
+    /* ==== ATTACHMENTS LOGIC ==== */
+    function handleFileSelect(event) {
+        const files = Array.from(event.target.files);
+        processFiles(files);
+        event.target.value = '';
+    }
+
+    function processFiles(files) {
+        files.forEach(file => {
+            const reader = new FileReader();
+            const isText = file.type.startsWith('text/') || /\.(txt|md|json|xml|csv|yaml|yml|java|js|ts|py|html|css|sh|bat|properties|sql|log|java|cs|cpp|h|go|rs)$/i.test(file.name);
+            
+            reader.onload = (e) => {
+                let content = e.target.result;
+                let processedContent = content;
+
+                if (file.type.startsWith('image/')) {
+                    processedContent = `[Imagen adjunta: ${file.name}]\nBase64: ${content}`;
+                } else if (!isText) {
+                    processedContent = `[Fichero binario: ${file.name} (${(file.size / 1024).toFixed(1)} KB) - El contenido binario no puede enviarse directamente como texto]`;
+                }
+
+                pendingFiles.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    content: processedContent,
+                    raw: content // For visualization
+                });
+                renderAttachments();
+            };
+
+            if (isText) reader.readAsText(file);
+            else reader.readAsDataURL(file);
+        });
+    }
+
+    function renderAttachments() {
+        const list = document.getElementById('attachPreviewList');
+        list.innerHTML = '';
+        pendingFiles.forEach((f, i) => {
+            const icon = f.type.startsWith('image/') ? '🖼️' : (f.type.startsWith('video/') ? '🎥' : '📄');
+            const card = document.createElement('div');
+            card.className = 'attach-card';
+            card.onclick = (e) => {
+                if (!e.target.classList.contains('attach-remove')) visualizeAttachment(i);
+            };
+            card.innerHTML = `
+                <span class="attach-icon">${icon}</span>
+                <div class="attach-info">
+                    <span class="attach-name">${f.name}</span>
+                    <span class="attach-size">${(f.size / 1024).toFixed(1)} KB</span>
+                </div>
+                <span class="attach-remove" onclick="event.stopPropagation(); removeAttachment(${i})">✕</span>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function removeAttachment(index) {
+        pendingFiles.splice(index, 1);
+        renderAttachments();
+    }
+
+    function visualizeAttachment(index) {
+        const f = pendingFiles[index];
+        const modal = document.getElementById('visualizerModal');
+        const title = document.getElementById('visualizerTitle');
+        const content = document.getElementById('visualizerContent');
+        
+        title.textContent = f.name;
+        content.innerHTML = '';
+        
+        if (f.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = f.raw;
+            content.appendChild(img);
+        } else if (f.type.startsWith('video/')) {
+            const vid = document.createElement('video');
+            vid.src = f.raw;
+            vid.controls = true;
+            content.appendChild(vid);
+        } else {
+            const pre = document.createElement('pre');
+            pre.textContent = f.content;
+            content.appendChild(pre);
+        }
+        
+        modal.classList.add('active');
+    }
+
 </script>
+
 </body>
 </html>

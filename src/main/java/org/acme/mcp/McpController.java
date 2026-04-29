@@ -103,11 +103,27 @@ public class McpController {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @SuppressWarnings("unchecked")
     public Object chatWithAgent(Map<String, Object> payload) {
         String userMessage = readString(payload, "message");
-        if (userMessage == null || userMessage.isBlank()) {
+        List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachments");
+        
+        StringBuilder fullPrompt = new StringBuilder();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (Map<String, String> att : attachments) {
+                String name = att.getOrDefault("fileName", "adjunto");
+                String content = att.getOrDefault("fileContent", "");
+                fullPrompt.append("[Fichero adjunto: ").append(name).append("]\n")
+                        .append(content).append("\n\n");
+            }
+        }
+        fullPrompt.append(userMessage != null ? userMessage : "");
+
+        String finalMessage = fullPrompt.toString();
+        if (finalMessage.isBlank()) {
             return Map.of("error", "El mensaje es obligatorio.");
         }
+
 
         String aiModel = readString(payload, "model");
         UUID userId = UUID.fromString(jwt.getSubject());
@@ -155,7 +171,7 @@ public class McpController {
         }
 
         try {
-            var result = (Map<String, Object>) agentService.runAssistant(chatModel, chatSession.id, userMessage, connectedSessions);
+            var result = (Map<String, Object>) agentService.runAssistant(chatModel, chatSession.id, finalMessage, connectedSessions);
             
             // Return sessionId to frontend so it can append future messages
             java.util.Map<String, Object> finalResult = new java.util.HashMap<>(result);
